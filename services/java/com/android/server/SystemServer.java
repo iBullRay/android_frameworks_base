@@ -80,6 +80,27 @@ import java.util.TimerTask;
 import com.stericsson.hardware.fm.FmReceiverService;
 import com.stericsson.hardware.fm.FmTransmitterService;
 
+import android.os.IBinder;
+import java.lang.reflect.Constructor;
+
+// Import com.actions.server.DisplayService
+final class ActionServiceManager {
+    private static final String POLICY_IMPL_CLASS_NAME =
+        "com.actions.server.DisplayService";
+    public static IBinder getDisplayManagerService(Context context){
+        // Pull in the actual implementation of the policy at run-time
+        try {
+            Class policyClass = Class.forName(POLICY_IMPL_CLASS_NAME);
+	    	Constructor cons = policyClass.getDeclaredConstructor(Context.class);
+	   		return (IBinder)cons.newInstance(context);		
+			
+        } catch (Exception ex) {
+            throw new RuntimeException(
+                    POLICY_IMPL_CLASS_NAME + " could not be loaded", ex);
+        } 
+    }
+}
+
 class ServerThread extends Thread {
     private static final String TAG = "SystemServer";
     private static final String ENCRYPTING_STATE = "trigger_restart_min_framework";
@@ -780,6 +801,14 @@ class ServerThread extends Thread {
                 reportWtf("starting SamplingProfiler Service", e);
             }
 
+			try {
+                Slog.i(TAG, "DisplayManager Service");
+                IBinder b = ActionServiceManager.getDisplayManagerService(context);
+		 		ServiceManager.addService("actions.display",b);
+            } catch (Throwable e) {
+                Slog.e(TAG, "Failure starting DisplayManager Service", e);
+            }
+			
             try {
                 Slog.i(TAG, "NetworkTimeUpdateService");
                 networkTimeUpdater = new NetworkTimeUpdateService(context);

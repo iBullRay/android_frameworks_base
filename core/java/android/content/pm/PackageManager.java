@@ -1215,6 +1215,13 @@ public abstract class PackageManager {
     public static final String EXTRA_VERIFICATION_VERSION_CODE
             = "android.content.pm.extra.VERIFICATION_VERSION_CODE";
 
+	/**
+     * Feature for {@link #getSystemAvailableFeatures} and
+	 * {@link #hasSystemFeature}: The device supports hdmi pattern of tvout.
+     */
+	@SdkConstant(SdkConstantType.FEATURE)
+	public static final String ACTIONS_FEATURE_TVOUT_HDMI = "actions.hardware.hdmi";
+
     /**
      * Retrieve overall information about an application package that is
      * installed on the system.
