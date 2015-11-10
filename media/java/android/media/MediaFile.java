@@ -59,7 +59,7 @@ public class MediaFile {
 
     // More audio file types
     public static final int FILE_TYPE_DTS   = 300;
-    public static final int FILE_TYPE_RM 	= 301; 
+    public static final int FILE_TYPE_RM    = 301; 
     public static final int FILE_TYPE_AA    = 302;
     public static final int FILE_TYPE_AIFF  = 303;
     public static final int FILE_TYPE_MPC   = 304;    
@@ -215,13 +215,26 @@ public class MediaFile {
         addFileType("AAC", FILE_TYPE_AAC, "audio/aac-adts", MtpConstants.FORMAT_AAC);
         addFileType("MKA", FILE_TYPE_MKA, "audio/x-matroska");
 		
+        addFileType("MP3", FILE_TYPE_MP3, "audio/MP3");
         addFileType("RM", FILE_TYPE_RM, "audio/x-pn-realaudio");
+        addFileType("RM", FILE_TYPE_RM, "audio/COOK");
         addFileType("RAM", FILE_TYPE_RM, "audio/x-pn-realaudio");
         addFileType("DTS", FILE_TYPE_DTS, "audio/x-dts");
+        addFileType("DTS", FILE_TYPE_DTS, "audio/DTS");
         addFileType("AC3", FILE_TYPE_AC3, "audio/x-ac3");
+        addFileType("AC3", FILE_TYPE_AC3, "audio/AC3");
         addFileType("AA", FILE_TYPE_AA, "audio/audible");
         addFileType("AAX", FILE_TYPE_AA, "audio/audible");
         addFileType("APE", FILE_TYPE_APE, "audio/x-ape");
+        addFileType("APE", FILE_TYPE_APE, "audio/APE");
+        addFileType("WMA", FILE_TYPE_WMA, "audio/WMASTD");
+        addFileType("WMA", FILE_TYPE_WMA, "audio/WMALSL");
+        addFileType("WMA", FILE_TYPE_WMA, "audio/WMAPRO");
+        addFileType("FLAC", FILE_TYPE_FLAC, "audio/FLAC");
+        addFileType("PCM", FILE_TYPE_PCM, "audio/PCM");
+        addFileType("PCM", FILE_TYPE_PCM, "audio/ADPCM");
+        addFileType("OGG", FILE_TYPE_OGG, "audio/OGG");
+        addFileType("AWB", FILE_TYPE_AWB, "audio/AWB");
 
         addFileType("MID", FILE_TYPE_MID, "audio/midi");
         addFileType("MIDI", FILE_TYPE_MID, "audio/midi");
@@ -245,8 +258,8 @@ public class MediaFile {
         addFileType("MKV", FILE_TYPE_MKV, "video/x-matroska");
         addFileType("WEBM", FILE_TYPE_WEBM, "video/webm");
         addFileType("TS", FILE_TYPE_MP2TS, "video/mp2ts");
+        addFileType("TS", FILE_TYPE_MP2TS, "video/ts");
         addFileType("MPG", FILE_TYPE_MP2TS, "video/mp2ts");
-
         addFileType("AVI", FILE_TYPE_AVI, "video/avi");
 
         addFileType("M2TS", FILE_TYPE_MP2TS, "video/ts");
@@ -256,6 +269,7 @@ public class MediaFile {
         addFileType("FLV", FILE_TYPE_FLV, "video/flv");
         addFileType("RMVB", FILE_TYPE_RMVB, "video/rm");
         addFileType("RM", FILE_TYPE_RMVB, "video/rm");
+        addFileType("MKV", FILE_TYPE_MKV, "video/mkv");
         addFileType("VOB", FILE_TYPE_MPG, "video/mpg");
         addFileType("EVO", FILE_TYPE_MPG, "video/mpg");
         addFileType("WMV", FILE_TYPE_WMV, "video/wmv");
