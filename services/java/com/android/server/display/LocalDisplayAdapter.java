@@ -43,6 +43,9 @@ final class LocalDisplayAdapter extends DisplayAdapter {
             Surface.BUILT_IN_DISPLAY_ID_HDMI,
     };
 
+    private static final int mDefaultRotation = SystemProperties.getInt("ro.sf.default_rotation", 0);
+    private static final int mHwRotation = SystemProperties.getInt("ro.sf.hwrotation", 0) / 90;
+
     private final SparseArray<LocalDisplayDevice> mDevices =
             new SparseArray<LocalDisplayDevice>();
     private HotplugDisplayEventReceiver mHotplugReceiver;
@@ -124,8 +127,23 @@ final class LocalDisplayAdapter extends DisplayAdapter {
         public DisplayDeviceInfo getDisplayDeviceInfoLocked() {
             if (mInfo == null) {
                 mInfo = new DisplayDeviceInfo();
-                mInfo.width = mPhys.width;
-                mInfo.height = mPhys.height;
+                if ((mHwRotation & 0x01) != 0) {
+                    if (mDefaultRotation == 1) {
+                        mInfo.width = mPhys.width;
+                        mInfo.height = mPhys.height;
+                    } else {
+                        mInfo.width = mPhys.height;
+                        mInfo.height = mPhys.width;
+                    }
+                } else {
+                    if (mDefaultRotation == 1) {
+                        mInfo.width = mPhys.height;
+                        mInfo.height = mPhys.width;
+                    } else {
+                        mInfo.width = mPhys.width;
+                        mInfo.height = mPhys.height;
+                    }
+                }
                 mInfo.refreshRate = mPhys.refreshRate;
 
                 // Assume that all built-in displays that have secure output (eg. HDCP) also
@@ -145,6 +163,7 @@ final class LocalDisplayAdapter extends DisplayAdapter {
                     mInfo.xDpi = mPhys.xDpi;
                     mInfo.yDpi = mPhys.yDpi;
                     mInfo.touch = DisplayDeviceInfo.TOUCH_INTERNAL;
+                    mInfo.rotation = mHwRotation;
                 } else {
                     mInfo.type = Display.TYPE_HDMI;
                     mInfo.name = getContext().getResources().getString(

@@ -25,6 +25,8 @@
 #include <media/mediametadataretriever.h>
 #include <private/media/VideoFrame.h>
 
+#include <actal_posix_dev.h>
+
 #include "jni.h"
 #include "JNIHelp.h"
 #include "android_runtime/AndroidRuntime.h"
@@ -345,7 +347,7 @@ static jobject android_media_MediaMetadataRetriever_extractMetadata(JNIEnv *env,
         return NULL;
     }
     const char* value = retriever->extractMetadata(keyCode);
-    if (!value) {
+    if (!value || (actal_check_utf8(value, strlen(value)) != 0)) {
         ALOGV("extractMetadata: Metadata is not found");
         return NULL;
     }

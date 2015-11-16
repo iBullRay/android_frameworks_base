@@ -17,6 +17,7 @@
 package com.android.server.display;
 
 import android.graphics.Rect;
+import android.os.SystemProperties;
 import android.view.Display;
 import android.view.DisplayInfo;
 import android.view.Surface;
@@ -58,6 +59,9 @@ final class LogicalDisplay {
     // The layer stack we use when the display has been blanked to prevent any
     // of its content from appearing.
     private static final int BLANK_LAYER_STACK = -1;
+
+    private static final int mDefaultRotation = SystemProperties.getInt("ro.sf.default_rotation", 0);
+    private static final int mHwRotation = SystemProperties.getInt("ro.sf.hwrotation", 0) / 90;
 
     private final int mDisplayId;
     private final int mLayerStack;
@@ -194,9 +198,14 @@ final class LogicalDisplay {
             mBaseDisplayInfo.name = deviceInfo.name;
             mBaseDisplayInfo.appWidth = deviceInfo.width;
             mBaseDisplayInfo.appHeight = deviceInfo.height;
-            mBaseDisplayInfo.logicalWidth = deviceInfo.width;
-            mBaseDisplayInfo.logicalHeight = deviceInfo.height;
-            mBaseDisplayInfo.rotation = Surface.ROTATION_0;
+            if ((mHwRotation & 0x01) == 0) {
+                mBaseDisplayInfo.logicalWidth = deviceInfo.width;
+                mBaseDisplayInfo.logicalHeight = deviceInfo.height; 
+            } else {
+                mBaseDisplayInfo.logicalWidth = deviceInfo.height;
+                mBaseDisplayInfo.logicalHeight =  deviceInfo.width; 
+            }
+            mBaseDisplayInfo.rotation = mDefaultRotation;
             mBaseDisplayInfo.refreshRate = deviceInfo.refreshRate;
             mBaseDisplayInfo.logicalDensityDpi = deviceInfo.densityDpi;
             mBaseDisplayInfo.physicalXDpi = deviceInfo.xDpi;

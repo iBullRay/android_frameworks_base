@@ -36,6 +36,7 @@ LOCAL_SHARED_LIBRARIES := \
     libusbhost \
     libexif \
     libstagefright_amrnb_common \
+    libalc
 
 LOCAL_REQUIRED_MODULES := \
     libexif_jni
@@ -56,7 +57,8 @@ LOCAL_C_INCLUDES += \
     frameworks/native/include/media/openmax \
     $(PV_INCLUDES) \
     $(JNI_H_INCLUDE) \
-    $(call include-path-for, corecg graphics)
+    $(call include-path-for, corecg graphics) \
+    $(call include-path-for, alsp)
 
 LOCAL_CFLAGS +=
 
