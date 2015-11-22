@@ -83,21 +83,18 @@ import com.stericsson.hardware.fm.FmTransmitterService;
 import android.os.IBinder;
 import java.lang.reflect.Constructor;
 
-// Import com.actions.server.DisplayService
+/* Import Actions DisplayService */
 final class ActionServiceManager {
-    private static final String POLICY_IMPL_CLASS_NAME =
-        "com.actions.server.DisplayService";
-    public static IBinder getDisplayManagerService(Context context){
-        // Pull in the actual implementation of the policy at run-time
+    private static final String POLICY_IMPL_CLASS_NAME = "com.actions.server.DisplayService";
+
+    public static IBinder getDisplayManagerService(Context context) {
         try {
             Class policyClass = Class.forName(POLICY_IMPL_CLASS_NAME);
 	    	Constructor cons = policyClass.getDeclaredConstructor(Context.class);
-	   		return (IBinder)cons.newInstance(context);		
-			
+	   		return (IBinder)cons.newInstance(context);
         } catch (Exception ex) {
-            throw new RuntimeException(
-                    POLICY_IMPL_CLASS_NAME + " could not be loaded", ex);
-        } 
+            throw new RuntimeException(POLICY_IMPL_CLASS_NAME + " could not be loaded", ex);
+        }
     }
 }
 
@@ -801,10 +798,10 @@ class ServerThread extends Thread {
                 reportWtf("starting SamplingProfiler Service", e);
             }
 
-			try {
-                Slog.i(TAG, "DisplayManager Service");
+            try {
+                Slog.i(TAG, "Actions DisplayManager Service");
                 IBinder b = ActionServiceManager.getDisplayManagerService(context);
-		 		ServiceManager.addService("actions.display",b);
+                ServiceManager.addService("actions.display",b);
             } catch (Throwable e) {
                 Slog.e(TAG, "Failure starting DisplayManager Service", e);
             }

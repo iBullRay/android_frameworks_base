@@ -294,6 +294,8 @@ public class WindowManagerService extends IWindowManager.Stub
 
     private static final String SYSTEM_SECURE = "ro.secure";
     private static final String SYSTEM_DEBUGGABLE = "ro.debuggable";
+    private static final String SYSTEM_DEFAULT_ROTATION = "ro.sf.default_rotation";
+    private static final String SYSTEM_HW_ROTATION = "ro.sf.hwrotation";
 
     final private KeyguardDisableHandler mKeyguardDisableHandler;
 
@@ -465,6 +467,8 @@ public class WindowManagerService extends IWindowManager.Stub
     private SparseArray<DisplayContent> mDisplayContents = new SparseArray<DisplayContent>();
 
     int mRotation = 0;
+    int mDefaultRotation = 0;
+    int mHwRotation = 0;
     int mForcedAppOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
     boolean mAltOrientation = false;
     ArrayList<IRotationWatcher> mRotationWatchers
@@ -812,6 +816,10 @@ public class WindowManagerService extends IWindowManager.Stub
         mDisplayManagerService = displayManager;
         mHeadless = displayManager.isHeadless();
         mPolicy = PolicyManager.makeNewWindowManager(device);
+
+        mDefaultRotation = SystemProperties.getInt(SYSTEM_DEFAULT_ROTATION, 0);
+        mHwRotation = SystemProperties.getInt(SYSTEM_HW_ROTATION, 0) / 90;
+        mRotation = mDefaultRotation;
 
         mDisplayManager = (DisplayManager)context.getSystemService(Context.DISPLAY_SERVICE);
         mDisplayManager.registerDisplayListener(this, null);
@@ -5915,7 +5923,7 @@ public class WindowManagerService extends IWindowManager.Stub
             // The screenshot API does not apply the current screen rotation.
             rot = getDefaultDisplayContentLocked().getDisplay().getRotation();
             // Allow for abnormal hardware orientation
-            rot = (rot + (android.os.SystemProperties.getInt("ro.sf.hwrotation",0) / 90 )) % 4;
+            rot = (rot + (android.os.SystemProperties.getInt("ro.sf.hwrotation", 0) / 90 )) % 4;
 
             int fw = frame.width();
             int fh = frame.height();
@@ -5943,6 +5951,10 @@ public class WindowManagerService extends IWindowManager.Stub
             // The screen shot will contain the entire screen.
             dw = (int)(dw*scale);
             dh = (int)(dh*scale);
+            rot = rot - (4 - mHwRotation);
+            if (rot < Surface.ROTATION_0) {
+                rot = rot + 4;
+            }
             if (rot == Surface.ROTATION_90 || rot == Surface.ROTATION_270) {
                 int tmp = dw;
                 dw = dh;
