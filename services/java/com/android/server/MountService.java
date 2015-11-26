@@ -1157,9 +1157,6 @@ class MountService extends IMountService.Stub
         mVolumes.clear();
         mVolumeStates.clear();
 
-        String usbFunctions = SystemProperties.get("persist.sys.usb.config", "adb");
-        boolean hasMassStorage = usbFunctions.contains("mass_storage");
-
         Resources resources = mContext.getResources();
 
         int id = com.android.internal.R.xml.storage_list;
@@ -1192,7 +1189,7 @@ class MountService extends IMountService.Stub
                             com.android.internal.R.styleable.Storage_emulated, false);
                     int mtpReserve = a.getInt(
                             com.android.internal.R.styleable.Storage_mtpReserve, 0);
-                    boolean allowMassStorage = hasMassStorage && a.getBoolean(
+                    boolean allowMassStorage = a.getBoolean(
                             com.android.internal.R.styleable.Storage_allowMassStorage, false);
                     // resource parser does not support longs, so XML value is in megabytes
                     long maxFileSize = a.getInt(
@@ -1492,56 +1489,51 @@ class MountService extends IMountService.Stub
 
         final StorageVolume primary = getPrimaryPhysicalVolume();
         if (primary == null) return;
-
-        // TODO: Add support for multiple share methods
-
-        for (String path : getShareableVolumes()) {
-            /*
-             * If the volume is mounted and we're enabling then unmount it
-             */
-            String path = Environment.getFlashStorageDirectory().getPath();
-            String vs = getVolumeState(path);
-            String path_tf = Environment.getTfcardStorageDirectory().getPath();
-            String vs_tf = getVolumeState(path_tf);
-            String method = "ums";
-            if (enable && vs.equals(Environment.MEDIA_MOUNTED)) {
-                // Override for isUsbMassStorageEnabled()
-                setUmsEnabling(enable);
-                UmsEnableCallBack umscb = new UmsEnableCallBack(path, method, true);
-                mHandler.sendMessage(mHandler.obtainMessage(H_UNMOUNT_PM_UPDATE, umscb));
-                // Clear override
-                setUmsEnabling(false);
-            } else if (enable && vs_tf.equals(Environment.MEDIA_MOUNTED)) {
-                // Override for isUsbMassStorageEnabled()
-                setUmsEnabling(enable);
-                UmsEnableCallBack umscb = new UmsEnableCallBack(path_tf, method, true);
-                mHandler.sendMessage(mHandler.obtainMessage(H_UNMOUNT_PM_UPDATE, umscb));
-                // Clear override
-                setUmsEnabling(false);
+        /*
+         * If the volume is mounted and we're enabling then unmount it
+         */
+        String path = Environment.getFlashStorageDirectory().getPath();
+        String vs = getVolumeState(path);
+        String path_tf = Environment.getTfcardStorageDirectory().getPath();
+        String vs_tf = getVolumeState(path_tf);
+        String method = "ums";
+        if (enable && vs.equals(Environment.MEDIA_MOUNTED)) {
+            // Override for isUsbMassStorageEnabled()
+            setUmsEnabling(enable);
+            UmsEnableCallBack umscb = new UmsEnableCallBack(path, method, true);
+            mHandler.sendMessage(mHandler.obtainMessage(H_UNMOUNT_PM_UPDATE, umscb));
+            // Clear override
+            setUmsEnabling(false);
+        } else if (enable && vs_tf.equals(Environment.MEDIA_MOUNTED)) {
+            // Override for isUsbMassStorageEnabled()
+            setUmsEnabling(enable);
+            UmsEnableCallBack umscb = new UmsEnableCallBack(path_tf, method, true);
+            mHandler.sendMessage(mHandler.obtainMessage(H_UNMOUNT_PM_UPDATE, umscb));
+            // Clear override
+            setUmsEnabling(false);
+        }
+        /*
+         * If we disabled UMS then mount the volume
+         */
+        if (!enable) {
+            doShareUnshareVolume(path, method, enable);
+            if (vs_tf.equals(Environment.MEDIA_SHARED)) {
+                doShareUnshareVolume(path_tf, method, enable);
             }
-            /*
-             * If we disabled UMS then mount the volume
-             */
-            if (!enable) {
-                doShareUnshareVolume(path, method, enable);
-                if (vs_tf.equals(Environment.MEDIA_SHARED)) {
-                    doShareUnshareVolume(path_tf, method, enable);
-                }
-                if (doMountVolume(path) != StorageResultCode.OperationSucceeded) {
-                    Slog.e(TAG, "Failed to remount " + path +
+            if (doMountVolume(path) != StorageResultCode.OperationSucceeded) {
+                Slog.e(TAG, "Failed to remount " + path +
+                        " after disabling share method " + method);
+                /*
+                 * Even though the mount failed, the unshare didn't so don't indicate an error.
+                 * The mountVolume() call will have set the storage state and sent the necessary
+                 * broadcasts.
+                 */
+            }
+            if (!vs_tf.equals(Environment.MEDIA_BAD_REMOVAL)
+                    && !vs_tf.equals(Environment.MEDIA_REMOVED)) {
+                if (doMountVolume(path_tf) != StorageResultCode.OperationSucceeded) {
+                    Slog.e(TAG, "Failed to remount " + path_tf +
                             " after disabling share method " + method);
-                    /*
-                     * Even though the mount failed, the unshare didn't so don't indicate an error.
-                     * The mountVolume() call will have set the storage state and sent the necessary
-                     * broadcasts.
-                     */
-                }
-                if (!vs_tf.equals(Environment.MEDIA_BAD_REMOVAL)
-                        && !vs_tf.equals(Environment.MEDIA_REMOVED)) {
-                    if (doMountVolume(path_tf) != StorageResultCode.OperationSucceeded) {
-                        Slog.e(TAG, "Failed to remount " + path_tf +
-                                " after disabling share method " + method);
-                    }
                 }
             }
         }
