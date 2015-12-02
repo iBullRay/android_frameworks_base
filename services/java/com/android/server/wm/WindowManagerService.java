@@ -819,7 +819,6 @@ public class WindowManagerService extends IWindowManager.Stub
 
         mDefaultRotation = SystemProperties.getInt(SYSTEM_DEFAULT_ROTATION, 0);
         mHwRotation = SystemProperties.getInt(SYSTEM_HW_ROTATION, 0) / 90;
-        mRotation = mDefaultRotation;
 
         mDisplayManager = (DisplayManager)context.getSystemService(Context.DISPLAY_SERVICE);
         mDisplayManager.registerDisplayListener(this, null);
@@ -827,6 +826,8 @@ public class WindowManagerService extends IWindowManager.Stub
         for (Display display : displays) {
             createDisplayContentLocked(display);
         }
+
+        mRotation = mDefaultRotation;
 
         mKeyguardDisableHandler = new KeyguardDisableHandler(mContext, mPolicy);
 
@@ -5922,8 +5923,6 @@ public class WindowManagerService extends IWindowManager.Stub
 
             // The screenshot API does not apply the current screen rotation.
             rot = getDefaultDisplayContentLocked().getDisplay().getRotation();
-            // Allow for abnormal hardware orientation
-            rot = (rot + (android.os.SystemProperties.getInt("ro.sf.hwrotation", 0) / 90 )) % 4;
 
             int fw = frame.width();
             int fh = frame.height();

@@ -43,6 +43,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Process;
+import android.os.SystemProperties;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -290,6 +291,8 @@ class GlobalScreenshot {
 
     private MediaActionSound mCameraSound;
 
+    private static final int mHwRotation = SystemProperties.getInt("ro.sf.hwrotation", 0) / 90;
+
 
     /**
      * @param context everything needs a context :(
@@ -362,6 +365,10 @@ class GlobalScreenshot {
      * @return the current display rotation in degrees
      */
     private float getDegreesForRotation(int value) {
+        value = (value - (4 - mHwRotation));
+        if (value < 0) {
+            value = value + 4;
+        }
         switch (value) {
         case Surface.ROTATION_90:
             return 360f - 90f;
@@ -381,10 +388,7 @@ class GlobalScreenshot {
         // only in the natural orientation of the device :!)
         mDisplay.getRealMetrics(mDisplayMetrics);
         float[] dims = {mDisplayMetrics.widthPixels, mDisplayMetrics.heightPixels};
-        int rot = mDisplay.getRotation();
-        // Allow for abnormal hardware orientation
-        rot = (rot + (android.os.SystemProperties.getInt("ro.sf.hwrotation",0) / 90 )) % 4;
-        float degrees = getDegreesForRotation(rot);
+        float degrees = getDegreesForRotation(mDisplay.getRotation());
         boolean requiresRotation = (degrees > 0);
         if (requiresRotation) {
             // Get the dimensions of the device in its native orientation
