@@ -254,12 +254,6 @@ public class Environment {
 
     private static final File DOWNLOAD_CACHE_DIRECTORY = getDirectory("DOWNLOAD_CACHE", "/cache");
 
-    private static final File FLASH_STORAGE_DIRECTORY = getDirectory("FLASH_STORAGE", "/mnt/sdcard");
-
-    private static final File TFCARD_STORAGE_DIRECTORY = getDirectory("TFCARD_STORAGE", "/mnt/sd-ext");
-
-    private static final File UHOST_STORAGE_DIRECTORY = getDirectory("UHOST_STORAGE", "/mnt/uhost");
-
     /**
      * Gets the Android data directory.
      */
@@ -321,33 +315,6 @@ public class Environment {
     public static File getExternalStorageDirectory() {
         throwIfSystem();
         return sCurrentUser.getExternalStorageDirectory();
-    }
-
-    /**
-    @hide
-    * Gets the Android Flash directory.
-    * @return Returns the Flash directory
-    */
-    public static File getFlashStorageDirectory() {
-        return FLASH_STORAGE_DIRECTORY;
-    }
-
-    /**
-    @hide
-    * Gets the Android Tfcard directory.
-    * @return Returns the Tf card directory
-    */
-    public static File getTfcardStorageDirectory() {
-        return TFCARD_STORAGE_DIRECTORY;
-    }
-
-    /**
-    @hide
-    * Gets the Android Uhost directory.
-    * @return Returns the Uhost directory
-    */
-    public static File getUhostStorageDirectory() {
-        return UHOST_STORAGE_DIRECTORY;
     }
 
     /** {@hide} */
@@ -625,48 +592,6 @@ public class Environment {
             return mountService.getVolumeState(primary.getPath());
         } catch (RemoteException rex) {
             Log.w(TAG, "Failed to read external storage state; assuming REMOVED: " + rex);
-            return Environment.MEDIA_REMOVED;
-        }
-    }
-
-    /**
-     @hide
-     @return Returns the Flash State
-    */
-    public static String getFlashStorageState() {
-        try {
-            IMountService mountService = IMountService.Stub.asInterface(ServiceManager
-                .getService("mount"));
-            return mountService.getVolumeState(getFlashStorageDirectory().toString());
-        } catch (Exception rex) {
-            return Environment.MEDIA_REMOVED;
-        }
-    }
-
-    /**
-     @hide
-     @return Returns the Tf card State
-    */
-    public static String getTfcardStorageState() {
-        try {
-            IMountService mountService = IMountService.Stub.asInterface(ServiceManager
-                .getService("mount"));
-            return mountService.getVolumeState(getTfcardStorageDirectory().toString());
-        } catch (Exception rex) {
-            return Environment.MEDIA_REMOVED;
-        }
-    }
-
-    /**
-     @hide
-     @return Returns the Uhost State
-    */
-    public static String getUhostStorageState() {
-        try {
-            IMountService mountService = IMountService.Stub.asInterface(ServiceManager
-                .getService("mount"));
-            return mountService.getVolumeState(getUhostStorageDirectory().toString());
-        } catch (Exception rex) {
             return Environment.MEDIA_REMOVED;
         }
     }
