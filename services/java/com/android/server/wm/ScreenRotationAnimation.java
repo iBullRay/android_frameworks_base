@@ -24,6 +24,7 @@ import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.os.SystemProperties;
 import android.util.Slog;
 import android.view.Display;
 import android.view.Surface;
@@ -54,6 +55,8 @@ class ScreenRotationAnimation {
     int mOriginalRotation;
     int mOriginalWidth, mOriginalHeight;
     int mCurRotation;
+
+    private static final int mOrientationDefault = SystemProperties.getInt("ro.sf.hwrotation", 0);
 
     // For all animations, "exit" is for the UI elements that are going
     // away (that is the snapshot of the old screen), and "enter" is for
@@ -198,8 +201,7 @@ class ScreenRotationAnimation {
         mEnterAnimId = enterAnim;
 
         // Allow for abnormal hardware orientation
-        mSnapshotRotation = (4 - android.os.SystemProperties.getInt("ro.sf.hwrotation", 0) / 90) % 4;
-        if (mSnapshotRotation == Surface.ROTATION_0 || mSnapshotRotation == Surface.ROTATION_180) {
+        if (mOrientationDefault == 90 || mOrientationDefault == 270) {
             if (originalRotation == Surface.ROTATION_90
                 || originalRotation == Surface.ROTATION_270) {
                 mWidth = originalHeight;
@@ -325,7 +327,12 @@ class ScreenRotationAnimation {
         // Compute the transformation matrix that must be applied
         // to the snapshot to make it stay in the same original position
         // with the current screen rotation.
-        int delta = deltaRotation(rotation, mSnapshotRotation);
+        int delta = 0;
+        if (mOrientationDefault == 0) {
+            delta = deltaRotation(rotation, Surface.ROTATION_0);
+        } else {
+            delta = deltaRotation(rotation, Surface.ROTATION_0 + (4 - mOrientationDefault / 90));
+        }
 
         createRotationMatrix(delta, mWidth, mHeight, mSnapshotInitialMatrix);
 
