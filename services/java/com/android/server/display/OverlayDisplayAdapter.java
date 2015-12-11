@@ -24,7 +24,6 @@ import android.database.ContentObserver;
 import android.graphics.SurfaceTexture;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemProperties;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Slog;
@@ -57,8 +56,6 @@ final class OverlayDisplayAdapter extends DisplayAdapter {
     private static final int MIN_HEIGHT = 100;
     private static final int MAX_WIDTH = 4096;
     private static final int MAX_HEIGHT = 4096;
-    
-    private static final int mHwRotation = SystemProperties.getInt("ro.sf.hwrotation", 0) / 90;
 
     private static final Pattern SETTING_PATTERN =
             Pattern.compile("(\\d+)x(\\d+)/(\\d+)");
@@ -246,7 +243,6 @@ final class OverlayDisplayAdapter extends DisplayAdapter {
                 mInfo.flags = 0;
                 mInfo.type = Display.TYPE_OVERLAY;
                 mInfo.touch = DisplayDeviceInfo.TOUCH_NONE;
-                mInfo.rotation = mHwRotation;
             }
             return mInfo;
         }

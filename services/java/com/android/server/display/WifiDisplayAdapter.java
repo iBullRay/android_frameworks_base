@@ -36,7 +36,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.Slog;
@@ -69,8 +68,6 @@ final class WifiDisplayAdapter extends DisplayAdapter {
 
     private static final int MSG_SEND_STATUS_CHANGE_BROADCAST = 1;
     private static final int MSG_UPDATE_NOTIFICATION = 2;
-
-    private static final int mHwRotation = SystemProperties.getInt("ro.sf.hwrotation", 0) / 90;
 
     private static final String ACTION_DISCONNECT = "android.server.display.wfd.DISCONNECT";
 
@@ -625,7 +622,6 @@ final class WifiDisplayAdapter extends DisplayAdapter {
                 mInfo.address = mAddress;
                 mInfo.touch = DisplayDeviceInfo.TOUCH_EXTERNAL;
                 mInfo.setAssumedDensityForExternalDisplay(mWidth, mHeight);
-                mInfo.rotation = mHwRotation;
             }
             return mInfo;
         }

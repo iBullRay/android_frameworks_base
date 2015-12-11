@@ -18,7 +18,6 @@ package com.android.server.display;
 
 import android.graphics.Rect;
 import android.os.IBinder;
-import android.os.SystemProperties;
 import android.view.Surface;
 
 import java.io.PrintWriter;
@@ -34,13 +33,10 @@ abstract class DisplayDevice {
     private final DisplayAdapter mDisplayAdapter;
     private final IBinder mDisplayToken;
 
-    private static final String SCREENSHOT_HW_ROTATION = "ro.sf.hwrotation";
-
     // The display device does not manage these properties itself, they are set by
     // the display manager service.  The display device shouldn't really be looking at these.
     private int mCurrentLayerStack = -1;
     private int mCurrentOrientation = -1;
-    private int mHwRotation = 0;
     private Rect mCurrentLayerStackRect;
     private Rect mCurrentDisplayRect;
 
@@ -51,7 +47,6 @@ abstract class DisplayDevice {
     public DisplayDevice(DisplayAdapter displayAdapter, IBinder displayToken) {
         mDisplayAdapter = displayAdapter;
         mDisplayToken = displayToken;
-        mHwRotation = SystemProperties.getInt(SCREENSHOT_HW_ROTATION, 0) / 90;
     }
 
     /**
@@ -180,13 +175,7 @@ abstract class DisplayDevice {
      * physical and logical rects based on the display's current projection.
      */
     public final void populateViewportLocked(DisplayViewport viewport) {
-        int rotation = mCurrentOrientation;
-        rotation -= mHwRotation;    	      	   	  
-        if (rotation < 0) {
-            rotation += 4;
-        }
-        viewport.orientation = rotation;
-
+        viewport.orientation = mCurrentOrientation;
         if (mCurrentLayerStackRect != null) {
             viewport.logicalFrame.set(mCurrentLayerStackRect);
         } else {
