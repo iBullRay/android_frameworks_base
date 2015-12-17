@@ -5,13 +5,13 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := \
-            $(call all-subdir-java-files) \
+        $(call all-subdir-java-files) \
 	    com/android/server/EventLogTags.logtags \
 	    com/android/server/am/EventLogTags.logtags
 
 LOCAL_MODULE:= services
 
-LOCAL_JAVA_LIBRARIES := android.policy telephony-common
+LOCAL_JAVA_LIBRARIES := android.policy telephony-common actions
 
 include $(BUILD_JAVA_LIBRARY)
 
