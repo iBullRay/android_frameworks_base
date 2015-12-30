@@ -377,9 +377,13 @@ class ServerThread extends Thread {
             } else if (factoryTest == SystemServer.FACTORY_TEST_LOW_LEVEL) {
                 Slog.i(TAG, "No Bluetooth Service (factory test)");
             } else {
-                Slog.i(TAG, "Bluetooth Manager Service");
-                bluetooth = new BluetoothManagerService(context);
-                ServiceManager.addService(BluetoothAdapter.BLUETOOTH_MANAGER_SERVICE, bluetooth);
+                // Not all Actions based devices have bluetooth
+                // so we check one property to show/hide this service
+                if (SystemProperties.get("ro.support.bluetooth").equals("true")) {
+                    Slog.i(TAG, "Bluetooth Manager Service");
+                    bluetooth = new BluetoothManagerService(context);
+                    ServiceManager.addService(BluetoothAdapter.BLUETOOTH_MANAGER_SERVICE, bluetooth);
+                }
             }
 
         } catch (RuntimeException e) {
